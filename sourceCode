@@ -1,0 +1,59 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+contract LoanApproval {
+    uint256 public cibilScore = 300;
+    address public owner;
+
+    // Event to log changes in CIBIL score
+    event CibilScoreChanged(uint256 currentScore);
+
+    // Modifier to restrict access to the owner
+    modifier onlyOwner() {
+        require(msg.sender == owner, "Caller is not the owner");
+        _;
+    }
+
+    constructor() {
+        // Set the contract deployer as the owner
+        owner = msg.sender;
+    }
+
+    // Function to approve high-risk loan
+    function approveHighRiskLoan(uint256 currentScore) external onlyOwner {
+        require(currentScore >= 300 && currentScore < 600, "CIBIL score does not qualify for high-risk loan");
+
+        cibilScore = currentScore;
+        emit CibilScoreChanged(currentScore);
+    }
+
+    // Function to approve moderate-risk loan
+    function approveModerateRiskLoan(uint256 currentScore) external onlyOwner {
+        require(currentScore >= 600 && currentScore < 750, "CIBIL score does not qualify for moderate-risk loan");
+
+        cibilScore = currentScore;
+        emit CibilScoreChanged(currentScore);
+    }
+
+    // Function to approve low-risk loan
+    function approveLowRiskLoan(uint256 currentScore) external onlyOwner {
+        require(currentScore >= 750, "CIBIL score does not qualify for low-risk loan");
+
+        cibilScore = currentScore;
+        emit CibilScoreChanged(currentScore);
+    }
+
+    // Function to check minimum CIBIL score for any loan approval
+    function checkMinimumCibilScore() external view {
+        assert(cibilScore >= 300); // This should always be true
+    }
+
+    // Function to check if any loan can be approved
+    function approveAnyLoan(uint256 currentScore) external onlyOwner {
+        if (currentScore < 300) {
+            revert("CIBIL score is too low for any loan approval.");
+        }
+        cibilScore = currentScore;
+        emit CibilScoreChanged(currentScore);
+    }
+}
